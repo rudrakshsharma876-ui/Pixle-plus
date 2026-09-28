@@ -122,3 +122,28 @@ chips.forEach(chip => {
     performSearch(query);
   });
 });
+async function search(query) {
+  status.innerHTML = '<div class="spinner"></div> Searching…'; // loading ON
+  showSkeletons();                                            // placeholder cards
+
+  const response = await fetch(url);
+  const data = await response.json();
+  const items = Object.values(data.query.pages);
+
+  status.textContent = "Showing " + items.length + " results.";
+  render(items);                                              // loading OFF, results in
+}
+try {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(res.status);   // bad status -> jump to catch
+  const data = await res.json();
+  const items = Object.values(data.query.pages);
+
+  if (items.length === 0) {
+    status.textContent = "No results. Try another search.";  // EMPTY state
+  } else {
+    render(items);                                           // RESULTS state
+  }
+} catch (err) {
+  status.textContent = "Something went wrong. Please try again."; // ERROR state
+}
